@@ -1,1 +1,1 @@
-# Simple ether wallet
+# SIMPLE platform for testing
