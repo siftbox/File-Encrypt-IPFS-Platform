@@ -11,6 +11,7 @@ import contractHelper from "../../helper/contractHelper";
 
 
 export const uploadDocument = async (req, res) => {
+	
 	if (req.files && req.files.file && req.body.walletAddress && req.body.password && req.body.alias1 && req.body.alias2) {
 		const ipfs = await ipfsNode.getNode();
 
@@ -33,7 +34,7 @@ export const uploadDocument = async (req, res) => {
 
 		const files = [{ path: file.name, content: file.data }];
 
-		// now code to upload to ipfs
+		//now code to upload to ipfs
 		ipfs.files.add(files, async (err, files) => {
 			if (err) {
 				throw err;
@@ -155,8 +156,7 @@ export const runCron = (app) => {
 				contractInstance.methods.getDocumentIds(walletAddress)
 					.call()
 					.then(res => {
-						const ids = Object.keys(res).map(key => res[key]).filter(x => x.length > 0);
-						ids.map(id => {
+						res.map(id => {
 							contractInstance.methods.getDocument(Number(id))
 								.call()
 								.then(async documentData => {
@@ -230,7 +230,7 @@ export const getHeartbeat = async (req, res) => {
 					};
 
 					await req.app.web3Helper.sendRawErcTransaction(contractInstance, trxPayload);
-					return res.status(200).json({ result: _res, newDate: nextTime });
+					return res.status(200).json({ result: String(_res), newDate: String(nextTime) });
 				}).catch(exe => {
 					console.log(exe);
 				});
