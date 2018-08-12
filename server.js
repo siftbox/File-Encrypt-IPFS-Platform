@@ -80,5 +80,5 @@ redisClient.on("ready", async () => {
 });
 
 require("./engine").default(app);
-server.listen(constant.configServer.port, "0.0.0.0");
+server.listen(constant.configServer.port);
 app.loggerClient("SERVER", "Running on port " + constant.configServer.port);

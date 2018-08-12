@@ -7,4 +7,5 @@ export const routes = [
 	{ method: "post", endPoint: "getHeartbeat@getHeartbeat" },
 	{ method: "post", endPoint: "register@register" },
 	{ method: "get", endPoint: "mail@mail/:hash/:policyId" },
+	{ method: "get", endPoint: "ping@ping" },
 ];
