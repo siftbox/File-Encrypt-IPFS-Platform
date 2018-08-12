@@ -9,6 +9,7 @@ import moment from "moment";
 
 import contractHelper from "../../helper/contractHelper";
 
+
 export const uploadDocument = async (req, res) => {
 	if (req.files && req.files.file && req.body.walletAddress && req.body.password && req.body.alias1 && req.body.alias2) {
 		const ipfs = await ipfsNode.getNode();
@@ -94,13 +95,18 @@ export const isAlive = async (req, res) => {
 				if (address) {
 					contractInstance.methods.getLastSeen(String(address))
 						.call()
-						.then(res => {
+						.then(_res => {
+							if (_res.length < 1) {
+								_res = 0;
+							}
+
 							// now get new date
 							const nowTime = moment().valueOf();
-							if (nowTime > Number(res)) {
+							console.log(_res, nowTime);
+							if (nowTime > Number(_res)) {
 								return res.status(400).json({ result: false });
 							} else {
-								return res.status(400).json({ result: true });
+								return res.status(200).json({ result: true });
 							}
 						}).catch(exe => {
 							console.log(exe);
@@ -137,7 +143,9 @@ export const runCron = (app) => {
 		// get all customers
 		let accounts = await app.redisHelper.hgetall(constant.REDIS_CUSTOMER_MAP);
 		if (accounts) {
-			accounts = Object.keys(accounts).map(key => key);
+			accounts = Object.keys(accounts).map(key => key).filter(x => x != "undefined");
+		} else {
+			accounts = [];
 		}
 
 		if (accounts.length > 0) {
@@ -147,21 +155,22 @@ export const runCron = (app) => {
 				contractInstance.methods.getDocumentIds(walletAddress)
 					.call()
 					.then(res => {
-						const ids = Object.keys(res).map(key => res[key]);
+						const ids = Object.keys(res).map(key => res[key]).filter(x => x.length > 0);
 						ids.map(id => {
 							contractInstance.methods.getDocument(Number(id))
 								.call()
-								.then(documentData => {
+								.then(async documentData => {
 									const dataArray = Object.keys(documentData).map(key => documentData[key]);
-									const payload = {
-										"ciphertext": dataArray[0],
-										"policy_id": dataArray[3],
-										"capsule": dataArray[4],
-										"alice_signing_pubkey": dataArray[5],
-										"alice_pubkey": dataArray[6],
-									};
-
-									securityClient.decrypt(payload);
+									if (dataArray[0].length > 0) {
+										const payload = {
+											"ciphertext": dataArray[0],
+											"policy_id": dataArray[3],
+											"capsule": dataArray[4],
+											"alice_signing_pubkey": dataArray[5],
+											"alice_pubkey": dataArray[6],
+										};
+										await securityClient.decrypt(payload);
+									}
 								});
 						});
 					}).catch(exe => {
@@ -169,7 +178,7 @@ export const runCron = (app) => {
 					});
 			});
 		}
-	}, 50000);
+	}, 30000);
 };
 
 export const mail = async (req, res) => {
@@ -182,9 +191,13 @@ export const mail = async (req, res) => {
 			.call()
 			.then(res => {
 				const aliases = Object.keys(res).map(key => res[key]);
-				aliases.map(email => {
+				aliases.map(async email => {
 					if (String(email).length > 0) {
-						_mailClient.sendVanillaMail({ email: email, description: `https://ipfs.io/ipfs/${payload.hash}` });
+						const exists = await req.app.redisHelper.get(email);
+						if (!exists || (exists && exists != payload.policyId)) {
+							await req.app.redisHelper.set(email, payload.policyId);
+							_mailClient.sendVanillaMail({ email: email, description: `https://ipfs.io/ipfs/${payload.hash}` });
+						}
 					}
 				});
 			}).catch(exe => {
@@ -204,9 +217,9 @@ export const getHeartbeat = async (req, res) => {
 			const contractInstance = await getInstance(req.app);
 			contractInstance.methods.getLastSeen(payload.walletAddress)
 				.call()
-				.then(async res => {
+				.then(async _res => {
 					// now get new date
-					const nextTime = moment().add(24, "seconds").unix();
+					const nextTime = moment().valueOf() + 59;
 
 					const _payload = contractInstance.methods.setLastSeen(payload.walletAddress, String(nextTime)).encodeABI();
 					const trxPayload = {
@@ -217,7 +230,7 @@ export const getHeartbeat = async (req, res) => {
 					};
 
 					await req.app.web3Helper.sendRawErcTransaction(contractInstance, trxPayload);
-					return res.status(400).json({ result: res, newDate: nextTime });
+					return res.status(200).json({ result: _res, newDate: nextTime });
 				}).catch(exe => {
 					console.log(exe);
 				});

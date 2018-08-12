@@ -22,7 +22,7 @@ class mailClient {
 	}
 
 	// email from customer
-	async sendVanillaMail(app, payload) {
+	async sendVanillaMail(payload) {
 		if (!this.transporter) {
 			return null;
 		}
@@ -33,6 +33,8 @@ class mailClient {
 			subject: "Verification",
 			text: payload.description
 		};
+
+		console.log(mailOptions);
 
 		try {
 			// send mail with defined transport object

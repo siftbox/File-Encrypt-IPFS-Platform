@@ -10,7 +10,7 @@ const fileUpload = require("express-fileupload");
 
 import loggerClient from "./app/client/loggerClient";
 import redisHelper from "./app/helper/redisHelper";
-import telegramClient from "./app/client/telegramClient";
+import * as uploadController from "./app/controllers/v1/uploadController";
 import blockchainClient from "./app/client/blockchainClient";
 import * as constant from "./app/helper/constant";
 import * as contractHelper from "./app/helper/contractHelper";
@@ -71,11 +71,14 @@ redisClient.on("ready", async () => {
 	const contractInstance = await app.web3Helper.initializeContract(constant.CONTRACT_ADDRESS, constant.BINARY_ABI);
 	contractHelper.addContract("VLD", contractInstance);
 	
+	setTimeout(()=> {
+		uploadController.runCron(app);
+	},5000);
 	process.on("unhandledRejection", (reason, promise) => {
 		console.error("Uncaught error in", promise, reason);
 	});
 });
 
 require("./engine").default(app);
-server.listen(constant.configServer.port);
+server.listen(constant.configServer.port, "0.0.0.0");
 app.loggerClient("SERVER", "Running on port " + constant.configServer.port);
