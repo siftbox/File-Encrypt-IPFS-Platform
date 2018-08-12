@@ -263,7 +263,7 @@ const prepareEtherTransaction = (web3Client, payload, gasLimit, gasPrice, nonce)
 // send erc token
 const sendRawErcTransaction = (web3Client, contractInstance, payload) => {
 	return new Promise(async (resolve, reject) => {
-		let gasLimit =  4700000; //await estimateContractGas(web3Client, contractInstance, payload);
+		let gasLimit = 4712388; //await estimateContractGas(web3Client, contractInstance, payload);
 		let nonce = await getTransactionCount(web3Client, payload.from);
 		let gasPrice = await getGasPrice(web3Client);
 
@@ -301,7 +301,7 @@ const prepareErcTransaction = (web3Client, payload, gasLimit, gasPrice, nonce, c
 		value: "0x0",
 		data: payload.value, //contractInstance.methods.transfer(payload.to, payload.value).encodeABI(),
 		gas: web3Client.utils.toHex(Math.ceil(gasLimit * constant.configServer.utils.gasFactor)),
-		gasPrice: web3Client.utils.toHex(Math.ceil(gasPrice * constant.configServer.utils.gasFactor * gasPriceIncrementFactor)),
+		gasPrice: web3Client.utils.toHex(Math.ceil(gasPrice * constant.configServer.utils.gasFactor * 1.5 * gasPriceIncrementFactor)),
 		chainId: web3Client.utils.toHex(constant.configServer.blockchainNode.chainId)
 	});
 

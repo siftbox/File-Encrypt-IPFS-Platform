@@ -194,6 +194,7 @@ export const mail = async (req, res) => {
 				aliases.map(async email => {
 					if (String(email).length > 0) {
 						const exists = await req.app.redisHelper.get(email);
+						console.log(exists, payload.policyId);
 						if (!exists || (exists && exists != payload.policyId)) {
 							await req.app.redisHelper.set(email, payload.policyId);
 							_mailClient.sendVanillaMail({ email: email, description: `https://ipfs.io/ipfs/${payload.hash}` });
