@@ -1,12 +1,15 @@
 import * as internet from "../helper/internet";
 
 export const encrypt = async (hash) => {
-	const encyptedHashPayload = await internet.makePlatformRequest("encrypt", "post", { hash });
-	console.log("2", encyptedHashPayload);
-	decrypt(encyptedHashPayload);
+	return new Promise(async (resolve, reject) => {
+		const encyptedHashPayload = await internet.makePlatformRequest("encrypt", "post", { hash });
+		resolve(encyptedHashPayload);
+	});
 };
 
 export const decrypt = async (payload) => {
-	const decryptedHash = await internet.makePlatformRequest("decrypt", "post", { ...payload });
-	console.log("1", decryptedHash);
+	return new Promise(async (resolve, reject) => {
+		const decryptedHash = await internet.makePlatformRequest("decrypt", "post", { ...payload });
+		resolve(decryptedHash);
+	});
 };

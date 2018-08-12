@@ -33,11 +33,12 @@
 		"keythereum": "^1.0.2",
 		"kue": "^0.11.6",
 		"kue-ui-express": "^1.0.2",
-		"moment": "^2.18.1",
+		"moment": "^2.22.2",
 		"mongoose": "^4.7.6",
 		"mongoose-auto-increment": "^5.0.1",
 		"node-cron": "^1.2.1",
 		"node-telegram-bot-api": "^0.30.0",
+		"nodemailer": "^4.6.7",
 		"randomstring": "^1.1.5",
 		"redis": "^2.8.0",
 		"web3": "^1.0.0-beta.27"

@@ -15,5 +15,7 @@ export default {
 	unlockAccount: "personal_unlockAccount", // unlock an account
 	newFilter: "eth_newFilter",
 	newPendingTransactionFilter: "eth_newPendingTransactionFilter",
-	getLogs: "eth_getLogs"
+	getLogs: "eth_getLogs",
+	addDocument: "addDocument",
+	setLastSeen: "setLastSeen",
 };

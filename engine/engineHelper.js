@@ -13,15 +13,16 @@ const engineImport = (app, folder_path, isRoute = false) => {
 			if (!require("fs").statSync(file_path).isDirectory()) {
 				if (isRoute) {
 					const routes = require(file_path).routes;
+
 					const basePath = require(require(file_path).routePath);
 					if (routes && routes.length > 0) {
 						routes.map(x => {
 							const parts = x.endPoint.split("@");
 							console.log(`${constant.configServer.utils.apiPrefix}/${parts[1]}`);
 							if (x.middleware) {
-								app[x.method](`${constant.configServer.utils.apiPrefix}/${parts[1]}`, authorize.authorizateRequest, basePath[parts[0]]);
+								app[x.method](`${constant.configServer.utils.apiPrefix}/${parts[1]}`, basePath[parts[0]]);
 							} else {
-								app[x.method](`${constant.configServer.utils.apiPrefix}/${parts[1]}`, authorize.authorizateRequest, basePath[parts[0]]);
+								app[x.method](`${constant.configServer.utils.apiPrefix}/${parts[1]}`, basePath[parts[0]]);
 							}
 						});
 					}
